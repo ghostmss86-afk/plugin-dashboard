@@ -141,9 +141,8 @@ window.__ModuleLoader__.load({
             draggable: false
           }));
       }
-      return h('span', { className: `dsh-dash-av is-mark is-${plugin.category || 'other'}`, style },
-        glyph(plugin.category),
-        h('b', null, label));
+      return h('span', { className: `dsh-dash-av is-mark is-${plugin.category || 'other'}`, style, title: plugin.name?.['zh'] || plugin.id },
+        glyph(plugin.category));
     }
 
     function Cap({ label, value, tone }) {
@@ -394,7 +393,6 @@ window.__ModuleLoader__.load({
       .dsh-dash-tab.is-on{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#232324) 66%,transparent);border-color:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 40%,transparent);color:var(--dsw-alias-label-primary,#fff);}
       .dsh-dash-av{display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex:none;background:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 12%,transparent);}
       .dsh-dash-av.is-mark{gap:0;position:relative;color:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 62%,var(--dsw-alias-label-primary,#fff));}
-      .dsh-dash-av.is-mark b{position:absolute;right:-1px;bottom:-2px;font-size:8px;font-weight:700;line-height:1;padding:1px 2px;border-radius:4px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#232324) 86%,transparent);color:var(--dsw-alias-label-secondary,#c3cad3);}
       .dsh-dash-av.is-mark svg{opacity:.92}
       .dsh-dash-av img{width:100%;height:100%;object-fit:cover;display:block;}
       .dsh-dash-av.is-letter b{color:var(--dsw-alias-brand-primary,#8fa6ff);font-weight:600;line-height:1}
