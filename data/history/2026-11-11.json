@@ -1,6 +1,6 @@
 {
   "snapshot": {
-    "at": "2026-11-11T18:31:38.917Z",
+    "at": "2026-11-11T18:32:05.839Z",
     "x": {
       "handle": "mixinhub",
       "followers": 84,
@@ -63,10 +63,10 @@
           "url": "https://awesome-dsh-plugin.com/p/ghostmss86-afk/dsh-skin-studio/"
         },
         "delta": {
-          "week": null,
-          "month": null,
-          "stars": null,
-          "releaseDownloads": null
+          "week": 0,
+          "month": 0,
+          "stars": 0,
+          "releaseDownloads": 0
         }
       },
       {
@@ -138,10 +138,10 @@
         },
         "market": null,
         "delta": {
-          "week": null,
-          "month": null,
-          "stars": null,
-          "releaseDownloads": null
+          "week": 0,
+          "month": 0,
+          "stars": 0,
+          "releaseDownloads": 0
         }
       }
     ]
