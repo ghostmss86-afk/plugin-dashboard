@@ -1,6 +1,6 @@
 {
   "snapshot": {
-    "at": "2026-11-11T18:32:05.839Z",
+    "at": "2026-11-11T18:43:46.760Z",
     "x": {
       "handle": "mixinhub",
       "followers": 84,
@@ -82,8 +82,8 @@
           "package": "dsh-featured-market",
           "week": 2819,
           "month": 2819,
-          "version": "1.6.8",
-          "published": "2026-11-11T17:20:18.962Z"
+          "version": "1.7.0",
+          "published": "2026-11-11T18:36:05.577Z"
         },
         "github": {
           "repo": "ghostmss86-afk/dsh-featured-market",
@@ -91,11 +91,21 @@
           "forks": 0,
           "watchers": 0,
           "openIssues": 0,
-          "pushedAt": "2026-11-11T17:17:44Z",
+          "pushedAt": "2026-11-11T18:41:01Z",
           "releases": [
             {
+              "at": "2026-11-11T18:41:13Z",
+              "dl": 0,
+              "tag": "v1.7.1"
+            },
+            {
+              "at": "2026-11-11T18:33:54Z",
+              "dl": 0,
+              "tag": "v1.7.0"
+            },
+            {
               "at": "2026-11-11T17:17:56Z",
-              "dl": 6,
+              "dl": 7,
               "tag": "v1.6.8"
             },
             {
@@ -122,26 +132,16 @@
               "at": "2026-11-08T17:18:13Z",
               "dl": 1,
               "tag": "v1.6.3"
-            },
-            {
-              "at": "2026-11-08T17:15:13Z",
-              "dl": 1,
-              "tag": "v1.6.2"
-            },
-            {
-              "at": "2026-11-08T16:38:02Z",
-              "dl": 1,
-              "tag": "v1.6.1"
             }
           ],
-          "releaseDownloads": 92
+          "releaseDownloads": 93
         },
         "market": null,
         "delta": {
           "week": 0,
           "month": 0,
           "stars": 0,
-          "releaseDownloads": 0
+          "releaseDownloads": 1
         }
       }
     ]
