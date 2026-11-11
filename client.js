@@ -99,20 +99,51 @@ window.__ModuleLoader__.load({
       return String(value);
     };
 
+    // A real icon file would be nicer, but the panel renders inside the app
+    // origin where every extra fetch is one more quiet failure (it fell back to
+    // letters twice). Draw the mark from the category instead: no request, no
+    // broken-image state, same footprint as the app's own glyphs.
+    function glyph(category) {
+      const stroke = {
+        fill: 'none',
+        stroke: 'currentColor',
+        strokeWidth: 1.4,
+        strokeLinecap: 'round',
+        strokeLinejoin: 'round'
+      };
+      if (category === 'market') {
+        return h('svg', { viewBox: '0 0 16 16', width: 12, height: 12, 'aria-hidden': 'true' },
+          h('rect', { x: 2.2, y: 2.2, width: 5, height: 5, rx: 1.4, ...stroke }),
+          h('rect', { x: 8.8, y: 2.2, width: 5, height: 5, rx: 1.4, ...stroke }),
+          h('rect', { x: 2.2, y: 8.8, width: 5, height: 5, rx: 1.4, ...stroke }),
+          h('rect', { x: 8.8, y: 8.8, width: 5, height: 5, rx: 1.4, ...stroke }));
+      }
+      if (category === 'theme') {
+        return h('svg', { viewBox: '0 0 16 16', width: 12, height: 12, 'aria-hidden': 'true' },
+          h('path', { d: 'M8 2.6c2.1 2.3 3.4 3.9 3.4 5.6a3.4 3.4 0 0 1-6.8 0c0-1.7 1.3-3.3 3.4-5.6Z', ...stroke }),
+          h('path', { d: 'M6.6 9.4a1.6 1.6 0 0 0 1.6 1.6', ...stroke }));
+      }
+      return h('svg', { viewBox: '0 0 16 16', width: 12, height: 12, 'aria-hidden': 'true' },
+        h('path', { d: 'M8 2.4v11.2M2.4 8h11.2', ...stroke }));
+    }
+
     function Avatar({ plugin, size = 22 }) {
       const [broken, setBroken] = useState(false);
       const label = (plugin.name?.zh || plugin.name?.en || plugin.id || '?').trim().slice(0, 1);
-      const style = { width: size, height: size, borderRadius: Math.round(size / 3.4), fontSize: Math.round(size * 0.46) };
-      if (plugin.icon && !broken) {
+      const style = { width: size, height: size, borderRadius: Math.round(size / 3.4) };
+      const src = plugin.iconData || (plugin.icon ? `${API}/icon?id=${encodeURIComponent(plugin.id)}` : '');
+      if (src && !broken) {
         return h('span', { className: 'dsh-dash-av', style },
           h('img', {
-            src: `${API}/icon?id=${encodeURIComponent(plugin.id)}`,
+            src,
             alt: '',
             onError: () => setBroken(true),
             draggable: false
           }));
       }
-      return h('span', { className: 'dsh-dash-av is-letter', style }, h('b', null, label));
+      return h('span', { className: `dsh-dash-av is-mark is-${plugin.category || 'other'}`, style },
+        glyph(plugin.category),
+        h('b', null, label));
     }
 
     function Cap({ label, value, tone }) {
@@ -362,6 +393,9 @@ window.__ModuleLoader__.load({
       .dsh-dash-tab:hover{color:var(--dsw-alias-label-primary,#fff);}
       .dsh-dash-tab.is-on{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#232324) 66%,transparent);border-color:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 40%,transparent);color:var(--dsw-alias-label-primary,#fff);}
       .dsh-dash-av{display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex:none;background:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 12%,transparent);}
+      .dsh-dash-av.is-mark{gap:0;position:relative;color:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 62%,var(--dsw-alias-label-primary,#fff));}
+      .dsh-dash-av.is-mark b{position:absolute;right:-1px;bottom:-2px;font-size:8px;font-weight:700;line-height:1;padding:1px 2px;border-radius:4px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#232324) 86%,transparent);color:var(--dsw-alias-label-secondary,#c3cad3);}
+      .dsh-dash-av.is-mark svg{opacity:.92}
       .dsh-dash-av img{width:100%;height:100%;object-fit:cover;display:block;}
       .dsh-dash-av.is-letter b{color:var(--dsw-alias-brand-primary,#8fa6ff);font-weight:600;line-height:1}
       .dsh-dash-body{padding:4px 16px 12px;overflow-y:auto;}

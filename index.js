@@ -74,6 +74,27 @@ async function pluginIcon(id) {
   }
 }
 
+// Inline the icon as a data URL instead of making the browser fetch it: the
+// panel renders inside the app origin, where a second request per icon is one
+// more thing that can fail silently (it did — the tabs fell back to letters).
+const ICON_LIMIT = 96 * 1024;
+
+async function withIcons(plugins) {
+  const out = [];
+  for (const plugin of plugins ?? []) {
+    if (plugin.iconData || !plugin.icon) { out.push(plugin); continue; }
+    try {
+      const bytes = await readFile(plugin.icon);
+      if (bytes.byteLength > ICON_LIMIT) { out.push(plugin); continue; }
+      const type = plugin.icon.endsWith('.svg') ? 'image/svg+xml' : 'image/png';
+      out.push({ ...plugin, iconData: `data:${type};base64,${bytes.toString('base64')}` });
+    } catch {
+      out.push(plugin);
+    }
+  }
+  return out;
+}
+
 async function seedRegistry() {
   const target = join(DATA, 'registry.json');
   if (existsSync(target)) return;
@@ -99,6 +120,8 @@ async function handle(request) {
     const latest = await readJson(join(DATA, 'latest.json'), null);
     const registry = await readJson(join(DATA, 'registry.json'), { plugins: [], x: {} });
     if (!latest) return json({ ok: false, reason: 'no-snapshot', registry });
+    if (latest.snapshot) latest.snapshot.plugins = await withIcons(latest.snapshot.plugins);
+    if (registry.plugins) registry.plugins = await withIcons(registry.plugins);
     return json({ ok: true, ...latest, registry });
   }
 
@@ -234,3 +257,5 @@ export function apply(ctx) {
 }
 
 export const inject = [];
+
+// touched: force the host to re-apply this plugin so /summary carries inlined icons
