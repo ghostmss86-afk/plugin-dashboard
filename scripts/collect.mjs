@@ -15,10 +15,14 @@ import { execFile } from 'node:child_process';
 import { mkdir, readFile, writeFile, appendFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { copyFile } from 'node:fs/promises';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const DATA = join(ROOT, 'data');
+// Snapshots live outside the package: an npm install puts this directory in a
+// read-only node_modules tree, and a board's history is user data, not code.
+const DATA = process.env.DSH_DASHBOARD_DATA || join(homedir(), '.dsh', 'plugin-dashboard');
 const HISTORY = join(DATA, 'history');
 const MARKET_CATALOG = 'https://awesome-dsh-plugin.com/catalog.json';
 const X_MIRROR = 'https://api.fxtwitter.com';
@@ -196,7 +200,12 @@ function buildSuggestions(events, snapshot) {
 
 async function main() {
   await mkdir(HISTORY, { recursive: true });
-  const registry = await readJson(join(DATA, 'registry.json'), { plugins: [], x: {} });
+  // First run on a machine: seed the registry from the package default.
+  const registryPath = join(DATA, 'registry.json');
+  if (!existsSync(registryPath)) {
+    try { await copyFile(join(ROOT, 'data', 'registry.json'), registryPath); } catch {}
+  }
+  const registry = await readJson(registryPath, { plugins: [], x: {} });
   const previous = await readJson(join(DATA, 'latest.json'), null);
   const market = await marketIndex();
 
@@ -286,8 +295,8 @@ async function main() {
     reportLines.push(`- **${item.title}** — ${item.why}；建议：${item.action}（状态：${item.status}）`);
   }
   reportLines.push('', `X：@${x?.handle ?? registry.x?.handle ?? '—'} · 关注者 ${x?.followers ?? '—'} · 监控帖子 ${(x?.posts ?? []).length} 条`, '');
-  await mkdir(join(ROOT, 'reports'), { recursive: true });
-  await writeFile(join(ROOT, 'reports', `${today()}.md`), reportLines.join('\n'));
+  await mkdir(join(DATA, 'reports'), { recursive: true });
+  await writeFile(join(DATA, 'reports', `${today()}.md`), reportLines.join('\n'));
 
   const summary = {
     at: snapshot.at,

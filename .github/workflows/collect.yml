@@ -24,6 +24,8 @@ jobs:
       - run: node scripts/collect.mjs
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # In CI the history belongs in the repo, not in the runner's home.
+          DSH_DASHBOARD_DATA: ${{ github.workspace }}/data
       - run: |
           git config user.name 'dashboard-bot'
           git config user.email 'dashboard-bot@users.noreply.github.com'

@@ -13,12 +13,17 @@
  *   POST /feedback  attach a manual note (link + text) to the log
  */
 import { dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { readFile, writeFile, appendFile } from 'node:fs/promises';
+import { copyFile } from 'node:fs/promises';
+import { readFile, writeFile, appendFile, mkdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const DATA = join(HERE, 'data');
+// Same rule as scripts/collect.mjs: user data under ~/.dsh, never inside the
+// installed package (node_modules can be read-only).
+const DATA = process.env.DSH_DASHBOARD_DATA || join(homedir(), '.dsh', 'plugin-dashboard');
 const ROUTE_PREFIX = '/api/plugin-dashboard';
 const POLL_MS = 15 * 60 * 1000;
 
@@ -52,6 +57,15 @@ function collect() {
       resolve({ ok: false, code: -1, output: String(error && error.message) });
     });
   });
+}
+
+async function seedRegistry() {
+  const target = join(DATA, 'registry.json');
+  if (existsSync(target)) return;
+  try {
+    await mkdir(DATA, { recursive: true });
+    await copyFile(join(HERE, 'data', 'registry.json'), target);
+  } catch {}
 }
 
 async function handle(request) {
@@ -186,6 +200,7 @@ export function apply(ctx) {
   // Daily-ish refresh: one immediate pass, then every 15 minutes. The panel
   // reads whatever the last pass wrote, so the button and the timer share one
   // code path.
+  seedRegistry().catch(() => {});
   const tick = () => { collect().catch(() => {}); };
   ctx.effect(() => {
     const first = setTimeout(tick, 8000);

@@ -33,15 +33,18 @@ X 官方 API 需要付费层，本看板用的是公开镜像 `api.fxtwitter.com
 
 ## 目录
 
+数据默认写在 **`~/.dsh/plugin-dashboard/`**（不在 `node_modules` 里，重装插件不丢历史）：
+
 ```
-data/registry.json      要看的插件（npm 包名 / GitHub 仓库 / 市场 slug / X 账号）
-data/latest.json        面板直接读的那份
-data/history/YYYY-MM-DD.json  每天一份，用来算增量
-data/feedback.jsonl     追加式反馈事件（X 新增回复、GitHub issue 变化、手动粘贴）
-data/suggestions.json   建议 + 你的决定
-reports/YYYY-MM-DD.md   每天一份可读日报
-scripts/collect.mjs     采集器
+registry.json            要看的插件（npm 包名 / GitHub 仓库 / 市场 slug / X 账号）
+latest.json              面板直接读的那份
+history/YYYY-MM-DD.json  每天一份，用来算增量
+reports/YYYY-MM-DD.md    每天一份可读日报
+suggestions.json         建议 + 你的决定
+feedback.jsonl           追加式反馈事件（X 新增回复、GitHub issue 变化、手动粘贴）
 ```
+
+仓库里的 `data/registry.json` 只是首次运行的种子；GitHub Actions 用 `DSH_DASHBOARD_DATA=$GITHUB_WORKSPACE/data` 把 CI 的采集结果提交回仓库，所以远端也留得住历史。
 
 ## 加一个新插件
 
