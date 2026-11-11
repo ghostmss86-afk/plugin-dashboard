@@ -293,11 +293,12 @@ window.__ModuleLoader__.load({
 
     function Quick({ open, setOpen, pending }) {
       const ref = useRef(null);
+      const label = TEXT[useLocale()]['nav.label'];
       return h('button', {
         type: 'button',
         ref,
         className: `dsh-dash-quick${open ? ' is-open' : ''}`,
-        'aria-label': TEXT.zh['nav.label'],
+        'aria-label': label,
         'aria-expanded': open ? 'true' : 'false',
         onClick: () => setOpen(!open)
       },
@@ -305,7 +306,7 @@ window.__ModuleLoader__.load({
           h('rect', { x: 2.4, y: 3.2, width: 15.2, height: 4.1, rx: 2.05 }),
           h('rect', { x: 2.4, y: 8.6, width: 9.6, height: 4.1, rx: 2.05 }),
           h('rect', { x: 2.4, y: 14, width: 6.2, height: 3.4, rx: 1.7 })),
-        h('span', null, TEXT.zh['nav.label']),
+        h('span', null, label),
         pending ? h('i', null, pending) : null);
     }
 
