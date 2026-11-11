@@ -11,6 +11,7 @@
  *   POST /refresh   run the collector now
  *   POST /decide    record approve/reject on one suggestion (no side effects)
  *   POST /feedback  attach a manual note (link + text) to the log
+ *   GET  /icon      the plugin icon from its source folder (one board per icon)
  */
 import { dirname, join } from 'node:path';
 import { homedir } from 'node:os';
@@ -59,6 +60,20 @@ function collect() {
   });
 }
 
+async function pluginIcon(id) {
+  const registry = await readJson(join(DATA, 'registry.json'), {});
+  const discovered = await readJson(join(DATA, 'plugins.json'), {});
+  const catalogue = [...(discovered.plugins ?? []), ...(registry.plugins ?? [])];
+  const entry = catalogue.find((item) => item.id === id);
+  const icon = entry && entry.icon;
+  if (!icon) return null;
+  try {
+    return { bytes: new Uint8Array(await readFile(icon)), type: icon.endsWith('.svg') ? 'image/svg+xml' : 'image/png' };
+  } catch {
+    return null;
+  }
+}
+
 async function seedRegistry() {
   const target = join(DATA, 'registry.json');
   if (existsSync(target)) return;
@@ -71,6 +86,14 @@ async function seedRegistry() {
 async function handle(request) {
   const url = new URL(request.url);
   const suffix = url.pathname.slice(ROUTE_PREFIX.length) || '/summary';
+
+  if (suffix === '/icon' && (request.method === 'GET' || request.method === 'HEAD')) {
+    const icon = await pluginIcon(url.searchParams.get('id') ?? '');
+    if (!icon) return new Response('no icon', { status: 404 });
+    return new Response(request.method === 'HEAD' ? null : icon.bytes, {
+      headers: { 'content-type': icon.type, 'cache-control': 'private, max-age=300' }
+    });
+  }
 
   if (suffix === '/summary' && (request.method === 'GET' || request.method === 'HEAD')) {
     const latest = await readJson(join(DATA, 'latest.json'), null);
@@ -161,7 +184,8 @@ export function apply(ctx) {
     ['/refresh', ['POST', 'OPTIONS']],
     ['/decide', ['POST', 'OPTIONS']],
     ['/watch', ['POST', 'OPTIONS']],
-    ['/feedback', ['POST', 'OPTIONS']]
+    ['/feedback', ['POST', 'OPTIONS']],
+    ['/icon', ['GET', 'HEAD', 'OPTIONS']]
   ];
 
   const resource = (request) => handle(request);

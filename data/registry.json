@@ -1,13 +1,31 @@
 {
-  "x": { "handle": "mixinhub", "posts": [] },
+  "owner": "ghostmss86-afk",
+  "x": {
+    "handle": "mixinhub",
+    "posts": []
+  },
   "plugins": [
     {
-      "id": "dsh-skin-studio",
-      "name": { "en": "Skin Studio", "zh": "皮肤与壁纸" },
-      "npm": "dsh-plugin-skin-studio",
+      "id": "dsh-plugin-skin-studio",
       "repo": "ghostmss86-afk/dsh-skin-studio",
+      "npm": "dsh-plugin-skin-studio",
       "market": "ghostmss86-afk/dsh-skin-studio",
-      "xPosts": []
+      "name": {
+        "en": "Skin Studio",
+        "zh": "皮肤与壁纸"
+      },
+      "category": "theme"
+    },
+    {
+      "id": "dsh-featured-market",
+      "repo": "ghostmss86-afk/dsh-featured-market",
+      "npm": "dsh-featured-market",
+      "market": null,
+      "name": {
+        "en": "Curated market",
+        "zh": "精选插件市场"
+      },
+      "category": "market"
     }
   ]
 }

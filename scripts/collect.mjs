@@ -162,8 +162,8 @@ function buildSuggestions(events, snapshot) {
     const text = `${event.text ?? ''}`.toLowerCase();
     for (const signal of SIGNALS) {
       if (!signal.words.some((word) => text.includes(word.toLowerCase()))) continue;
-      const key = signal.id;
-      const bucket = groups.get(key) ?? { id: signal.id, title: signal.title, action: signal.action, count: 0, samples: [] };
+      const key2 = `${event.plugin ?? 'all'}:${signal.id}`;
+      const bucket = groups.get(key2) ?? { id: `sig-${event.plugin ?? 'all'}-${signal.id}`, plugin: event.plugin ?? 'all', title: signal.title, action: signal.action, count: 0, samples: [] };
       bucket.count += 1;
       if (bucket.samples.length < 3) bucket.samples.push({ text: (event.text ?? '').slice(0, 160), url: event.url ?? null, at: event.at ?? null });
       groups.set(key, bucket);
@@ -172,8 +172,8 @@ function buildSuggestions(events, snapshot) {
   const items = [];
   for (const bucket of groups.values()) {
     items.push({
-      id: `sig-${bucket.id}`,
-      plugin: 'dsh-skin-studio',
+      id: bucket.id,
+      plugin: bucket.plugin,
       title: bucket.title,
       why: `${bucket.count} 条反馈命中「${bucket.id}」`,
       action: bucket.action,
@@ -182,10 +182,10 @@ function buildSuggestions(events, snapshot) {
       at: now()
     });
   }
-  if (!items.length && snapshot?.plugins?.length) {
-    const plugin = snapshot.plugins[0];
+  for (const plugin of snapshot?.plugins ?? []) {
+    if (groups.size) break;
     items.push({
-      id: 'sig-quiet',
+      id: `sig-${plugin.id}-quiet`,
       plugin: plugin.id,
       title: '这一轮没有新的负面反馈',
       why: `近 7 天 npm 下载 ${plugin.npm?.week ?? '—'}，GitHub ★ ${plugin.github?.stars ?? '—'}，新增反馈 0 条`,
@@ -206,16 +206,30 @@ async function main() {
     try { await copyFile(join(ROOT, 'data', 'registry.json'), registryPath); } catch {}
   }
   const registry = await readJson(registryPath, { plugins: [], x: {} });
+  const discovered = await readJson(join(DATA, 'plugins.json'), null);
   const previous = await readJson(join(DATA, 'latest.json'), null);
   const market = await marketIndex();
 
-  const plugins = [];
+  // Discovery wins: a plugin that exists on disk gets a board without anyone
+  // remembering to register it. Manual entries fill in what a package.json
+  // cannot say (a Chinese display name, an X post list).
+  const catalogue = (discovered?.plugins ?? []).map((entry) => ({ ...entry }));
   for (const entry of registry.plugins ?? []) {
+    const index = catalogue.findIndex((item) => item.id === entry.id || (entry.repo && item.repo === entry.repo));
+    if (index >= 0) catalogue[index] = { ...catalogue[index], ...entry };
+    else if (entry.repo) catalogue.push({ ...entry, source: 'manual' });
+  }
+
+  const plugins = [];
+  for (const entry of catalogue) {
     const [npm, github] = await Promise.all([npmStats(entry.npm), githubStats(entry.repo)]);
     const marketItem = entry.market ? market.get(entry.market) ?? null : null;
     plugins.push({
       id: entry.id,
       name: entry.name ?? { en: entry.id, zh: entry.id },
+      category: entry.category ?? 'other',
+      icon: entry.icon ?? null,
+      source: entry.source ?? 'manual',
       npm,
       github,
       market: marketItem
@@ -224,7 +238,9 @@ async function main() {
     });
   }
 
-  const x = await xSnapshot(registry.x?.handle, registry.x?.posts ?? []);
+  const xPosts = (registry.x?.posts ?? []).map((post) => (typeof post === 'string' ? { url: post, plugin: null } : post));
+  const x = await xSnapshot(registry.x?.handle, xPosts.map((post) => post.url));
+  (x?.posts ?? []).forEach((post, index) => { post.plugin = xPosts[index]?.plugin ?? null; });
   const snapshot = { at: now(), x, plugins };
   diffPlugins(previous?.snapshot ?? previous, plugins);
 
@@ -236,23 +252,25 @@ async function main() {
       events.push({
         at: now(),
         source: 'x',
-        plugin: 'dsh-skin-studio',
+        plugin: post.plugin ?? plugins[0]?.id ?? 'unknown',
         kind: 'reply',
         text: `「${post.text.slice(0, 60)}」新增 ${post.replies - old.replies} 条回复（共 ${post.replies}）`,
         url: post.url
       });
     }
   }
-  const prevIssues = previous?.plugins?.[0]?.github?.openIssues ?? null;
-  const openIssues = plugins[0]?.github?.openIssues ?? null;
-  if (prevIssues != null && openIssues != null && openIssues !== prevIssues) {
+  const prevIssues = new Map((previous?.plugins ?? []).map((plugin) => [plugin.id, plugin.github?.openIssues ?? null]));
+  for (const plugin of plugins) {
+    const before = prevIssues.get(plugin.id);
+    const after = plugin.github?.openIssues ?? null;
+    if (before == null || after == null || before === after) continue;
     events.push({
       at: now(),
       source: 'github',
-      plugin: plugins[0].id,
-      kind: openIssues > prevIssues ? 'issue-open' : 'issue-close',
-      text: openIssues > prevIssues ? `GitHub 新增 issue（现存 ${openIssues}）` : `GitHub issue 减少（现存 ${openIssues}）`,
-      url: `https://github.com/${plugins[0].github.repo}/issues`
+      plugin: plugin.id,
+      kind: after > before ? 'issue-open' : 'issue-close',
+      text: after > before ? `GitHub 新增 issue（现存 ${after}）` : `GitHub issue 减少（现存 ${after}）`,
+      url: `https://github.com/${plugin.github.repo}/issues`
     });
   }
 

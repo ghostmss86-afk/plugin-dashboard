@@ -5,7 +5,7 @@ window.__ModuleLoader__.load({
     const h = React.createElement;
     let createPortal = null;
     try { createPortal = require('react-dom').createPortal; } catch (error) { createPortal = null; }
-    const { useEffect, useState } = React;
+    const { useEffect, useRef, useState } = React;
 
     const API = '/api/plugin-dashboard';
 
@@ -13,22 +13,10 @@ window.__ModuleLoader__.load({
       zh: {
         'nav.label': '看板',
         'panel.title': '插件看板',
-        'panel.sub': '下载 · 市场 · 反馈 · 迭代建议',
+        'panel.sub': '一个插件一块板：下载 · 市场 · 反馈 · 下一步',
         'panel.updated': '更新于',
-        'panel.refresh': '刷新数据',
-        'panel.refreshing': '正在收集…',
-        'panel.metrics': '每个插件',
-        'panel.feedback': '最新反馈',
-        'panel.suggestions': '今天可以做的事',
-        'panel.agree': '同意',
-        'panel.reject': '先不做',
-        'panel.agreed': '已记下：按这条走',
-        'panel.rejected': '已记下：这次不做',
-        'panel.gate': '所有改动都等你点头。看板只提建议，不会自己改代码、发版。',
-        'panel.empty': '还没有数据，点「刷新数据」跑一次收集。',
-        'panel.x': 'X 渠道',
-        'panel.followers': '关注者',
-        'panel.watch': '监控帖子',
+        'panel.refresh': '刷新',
+        'panel.refreshing': '收集中…',
         'panel.week': '周下载',
         'panel.month': '月下载',
         'panel.stars': '星标',
@@ -36,331 +24,398 @@ window.__ModuleLoader__.load({
         'panel.market': '市场',
         'panel.linked': '已关联',
         'panel.unlinked': '等抓取',
-        'panel.newFeedback': '新反馈',
-        'panel.none': '暂无',
-        'panel.watchHint': '贴一条你发的插件帖子链接，之后每 15 分钟抓一次它的回复数',
+        'panel.feedback': '最新反馈',
+        'panel.suggestions': '下一步',
+        'panel.agree': '同意',
+        'panel.reject': '先不做',
+        'panel.agreed': '已记下：按这条走',
+        'panel.rejected': '已记下：这次不做',
+        'panel.gate': '看板只提建议，不会自己改代码、发版；动手前一定问你。',
+        'panel.empty': '还没有数据。点「刷新」跑一次收集。',
+        'panel.none': '这一轮没有新反馈',
+        'panel.noSug': '暂时没有要做的事',
+        'panel.x': 'X 渠道',
+        'panel.followers': '关注者',
+        'panel.watch': '监控帖',
+        'panel.watchHint': '贴一条帖子的链接，之后每 15 分钟看一次它的回复数',
         'panel.watchAdd': '添加',
-        'panel.note': '每天收一次反馈，提一次建议；你同意才动。'
+        'panel.version': '版本',
+        'panel.local': '本机插件',
+        'panel.esc': '点空白处或按 Esc 关闭'
       },
       en: {
         'nav.label': 'Board',
         'panel.title': 'Plugin board',
-        'panel.sub': 'Downloads · market · feedback · next steps',
+        'panel.sub': 'One board per plugin: downloads · market · feedback · next step',
         'panel.updated': 'updated',
         'panel.refresh': 'Refresh',
         'panel.refreshing': 'Collecting…',
-        'panel.metrics': 'Each plugin',
+        'panel.week': 'Week',
+        'panel.month': 'Month',
+        'panel.stars': 'Stars',
+        'panel.release': 'Release DL',
+        'panel.market': 'Market',
+        'panel.linked': 'linked',
+        'panel.unlinked': 'pending',
         'panel.feedback': 'Recent feedback',
-        'panel.suggestions': 'What to do today',
+        'panel.suggestions': 'Next step',
         'panel.agree': 'Do it',
         'panel.reject': 'Not now',
         'panel.agreed': 'Noted: go ahead',
         'panel.rejected': 'Noted: skip this one',
-        'panel.gate': 'Nothing ships without your yes. The board only proposes — it never edits code or publishes.',
+        'panel.gate': 'The board only proposes. It never edits code or publishes — it asks you first.',
         'panel.empty': 'No data yet. Hit Refresh to run a collection.',
+        'panel.none': 'No new feedback this round',
+        'panel.noSug': 'Nothing queued',
         'panel.x': 'X channel',
         'panel.followers': 'followers',
-        'panel.watch': 'posts watched',
-        'panel.week': 'week',
-        'panel.month': 'month',
-        'panel.stars': 'stars',
-        'panel.release': 'release dl',
-        'panel.market': 'market',
-        'panel.linked': 'linked',
-        'panel.unlinked': 'pending crawl',
-        'panel.newFeedback': 'new',
-        'panel.none': 'none',
-        'panel.watchHint': 'Paste a link to one of your plugin posts; its reply count is polled every 15 min',
+        'panel.watch': 'Watched',
+        'panel.watchHint': 'Paste a post link; its reply count is checked every 15 minutes',
         'panel.watchAdd': 'Add',
-        'panel.note': 'One collection and one proposal a day; nothing moves without your say.'
+        'panel.version': 'Version',
+        'panel.local': 'Local plugin',
+        'panel.esc': 'Click outside or press Esc to close'
       }
     };
 
-    const CSS = `
-.dsh-dash-pill{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:10px;background:transparent;border:0;color:var(--dsw-alias-label-primary,#e6e7ea);font:inherit;font-size:13px;cursor:pointer;text-align:left;}
-.dsh-dash-pill:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary,#e6e7ea) 8%,transparent);}
-.dsh-dash-pill svg{flex:none;opacity:.85;}
-.dsh-dash-pill .dsh-dash-label{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.dsh-dash-dot{flex:none;min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-variant-numeric:tabular-nums;color:#fff;background:var(--dsh-skin-accent,#4d6bfe);}
-.dsh-dash-panel{position:fixed;left:16px;bottom:84px;width:min(720px,calc(100vw - 32px));max-height:min(70vh,640px);display:flex;flex-direction:column;border-radius:18px;overflow:hidden;
-  background:color-mix(in srgb,var(--dsw-specific-sidebar-fill,#2b2c30) 40%,transparent);
-  -webkit-backdrop-filter:var(--dsw-menu-backdrop-filter,blur(40px) saturate(150%));
-  backdrop-filter:var(--dsw-menu-backdrop-filter,blur(40px) saturate(150%));
-  border:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 12%,transparent);
-  box-shadow:0 18px 48px rgba(0,0,0,.28);
-  color:var(--dsw-alias-label-primary,#e6e7ea);
-  font-size:13px;z-index:2147482000;}
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  .dsh-dash-panel{background:var(--dsw-specific-menu,var(--dsw-alias-bg-overlay,#24272d));}
-}
-.dsh-dash-head{display:flex;align-items:baseline;gap:10px;padding:16px 18px 10px;}
-.dsh-dash-title{font-size:15px;font-weight:600;}
-.dsh-dash-sub{flex:1 1 auto;opacity:.55;font-size:11.5px;}
-.dsh-dash-close{border:0;background:transparent;color:inherit;opacity:.5;cursor:pointer;font-size:16px;line-height:1;padding:2px 4px;}
-.dsh-dash-close:hover{opacity:.9;}
-.dsh-dash-body{overflow:auto;padding:0 18px 16px;}
-.dsh-dash-section{margin-top:6px;padding-top:12px;border-top:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 9%,transparent);}
-.dsh-dash-section:first-child{border-top:0;padding-top:2px;}
-.dsh-dash-h{font-size:11px;letter-spacing:.04em;text-transform:uppercase;opacity:.45;margin:4px 0 8px;}
-.dsh-dash-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
-.dsh-dash-name{font-weight:600;margin-right:2px;}
-.dsh-dash-cap{display:inline-flex;align-items:baseline;gap:5px;padding:4px 10px;border-radius:999px;font-size:11.5px;line-height:1.2;
-  background:color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 7%,transparent);
-  border:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 10%,transparent);}
-.dsh-dash-cap b{font-weight:600;font-variant-numeric:tabular-nums;}
-.dsh-dash-cap span{opacity:.55;}
-.dsh-dash-cap.is-up b{color:#4ade80;}
-.dsh-dash-item{padding:9px 0;border-bottom:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 7%,transparent);}
-.dsh-dash-item:last-child{border-bottom:0;}
-.dsh-dash-item p{margin:0 0 4px;line-height:1.45;}
-.dsh-dash-why{opacity:.6;font-size:11.5px;}
-.dsh-dash-samples{margin:6px 0 0;padding-left:14px;opacity:.6;font-size:11.5px;}
-.dsh-dash-actions{display:flex;gap:8px;margin-top:8px;}
-.dsh-dash-btn{border-radius:999px;padding:5px 14px;font-size:12px;cursor:pointer;border:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 16%,transparent);background:transparent;color:inherit;}
-.dsh-dash-btn.primary{border-color:transparent;background:var(--dsh-skin-accent,#4d6bfe);color:#fff;}
-.dsh-dash-btn:disabled{opacity:.45;cursor:default;}
-.dsh-dash-foot{display:flex;align-items:center;gap:10px;padding:10px 18px 14px;border-top:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 9%,transparent);}
-.dsh-dash-gate{flex:1 1 auto;font-size:11px;opacity:.5;line-height:1.4;}
-.dsh-dash-empty{opacity:.55;padding:14px 0;}
-.dsh-dash-feed{font-size:12px;}
-.dsh-dash-feed a{color:inherit;}
-`;
-
-    function localeOf(ctx) {
-      try {
-        const snapshot = ctx.locale.getSnapshot();
-        const tag = snapshot?.locale || snapshot?.language || 'zh';
-        return String(tag).toLowerCase().startsWith('en') ? 'en' : 'zh';
-      } catch { return 'zh'; }
+    function useLocale() {
+      const [locale, setLocale] = useState('zh');
+      useEffect(() => {
+        const read = () => {
+          const raw = (document.documentElement.lang || navigator.language || 'zh').toLowerCase();
+          setLocale(raw.startsWith('en') ? 'en' : 'zh');
+        };
+        read();
+        const observer = new MutationObserver(read);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+        return () => observer.disconnect();
+      }, []);
+      return locale;
     }
 
-    function IconBoard(props) {
-      const size = (props && props.size) || 16;
-      return h('svg', { width: size, height: size, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.35, strokeLinecap: 'round', strokeLinejoin: 'round' },
-        h('rect', { x: 2, y: 2.5, width: 12, height: 11, rx: 2 }),
-        h('path', { d: 'M2 6.2h12' }),
-        h('path', { d: 'M5.4 9.2v2.4M8 8.2v3.4M10.6 9.8v1.8' }));
-    }
-
-    function fmt(value) {
-      if (value == null) return '—';
-      if (typeof value !== 'number') return String(value);
+    const nf = (value) => {
+      if (value === null || value === undefined) return '—';
       if (value >= 10000) return `${(value / 1000).toFixed(1)}k`;
       return String(value);
+    };
+
+    function Avatar({ plugin, size = 22 }) {
+      const [broken, setBroken] = useState(false);
+      const label = (plugin.name?.zh || plugin.name?.en || plugin.id || '?').trim().slice(0, 1);
+      const style = { width: size, height: size, borderRadius: Math.round(size / 3.4), fontSize: Math.round(size * 0.46) };
+      if (plugin.icon && !broken) {
+        return h('span', { className: 'dsh-dash-av', style },
+          h('img', {
+            src: `${API}/icon?id=${encodeURIComponent(plugin.id)}`,
+            alt: '',
+            onError: () => setBroken(true),
+            draggable: false
+          }));
+      }
+      return h('span', { className: 'dsh-dash-av is-letter', style }, h('b', null, label));
     }
 
-    function ago(iso) {
-      if (!iso) return '—';
-      const then = new Date(iso).getTime();
-      if (!Number.isFinite(then)) return '—';
-      const minutes = Math.max(0, Math.round((Date.now() - then) / 60000));
-      if (minutes < 1) return '刚刚';
-      if (minutes < 60) return `${minutes} 分钟前`;
-      const hours = Math.round(minutes / 60);
-      if (hours < 24) return `${hours} 小时前`;
-      return `${Math.round(hours / 24)} 天前`;
+    function Cap({ label, value, tone }) {
+      return h('div', { className: `dsh-dash-cap${tone ? ` is-${tone}` : ''}` },
+        h('span', { className: 'k' }, label),
+        h('b', { className: 'v' }, value));
     }
 
-    function Capsule(props) {
-      return h('span', { className: `dsh-dash-cap${props.up ? ' is-up' : ''}` },
-        h('b', null, fmt(props.value)),
-        h('span', null, props.label));
+    function Board({ plugin, events, suggestions, t, onDecide }) {
+      const npm = plugin.npm || {};
+      const github = plugin.github || {};
+      const releases = (github.releases || []).reduce((sum, item) => sum + (item.dl || 0), 0);
+      const linked = Boolean(plugin.market && Number(plugin.market.npm) > 0);
+      const mine = (suggestions || []).filter((item) => item.plugin === plugin.id && item.status === 'pending');
+      const feedback = (events || []).filter((item) => item.plugin === plugin.id).slice(0, 4);
+
+      return h('div', { className: 'dsh-dash-board' },
+        h('div', { className: 'dsh-dash-caps' },
+          h(Cap, { label: t('panel.week'), value: nf(npm.week) }),
+          h(Cap, { label: t('panel.month'), value: nf(npm.month) }),
+          h(Cap, { label: t('panel.stars'), value: nf(github.stars) }),
+          h(Cap, { label: t('panel.release'), value: nf(releases || null) }),
+          h(Cap, {
+            label: t('panel.market'),
+            value: linked ? t('panel.linked') : t('panel.unlinked'),
+            tone: linked ? 'ok' : 'wait'
+          }),
+          h(Cap, { label: t('panel.version'), value: npm.version || '—' })
+        ),
+        h('div', { className: 'dsh-dash-cols' },
+          h('section', { className: 'dsh-dash-sec' },
+            h('h4', null, t('panel.feedback')),
+            feedback.length
+              ? feedback.map((item, index) => h('div', { key: `${item.source}-${index}`, className: 'dsh-dash-feed' },
+                  h('span', { className: `dsh-dash-src is-${item.source}` }, item.source.toUpperCase()),
+                  h('p', null, item.title || item.text || item.kind),
+                  h('time', null, (item.at || '').slice(5, 16).replace('T', ' '))))
+              : h('p', { className: 'dsh-dash-hint' }, t('panel.none'))),
+          h('section', { className: 'dsh-dash-sec' },
+            h('h4', null, t('panel.suggestions')),
+            mine.length
+              ? mine.slice(0, 2).map((item) => h('div', { key: item.id, className: 'dsh-dash-sug' },
+                  h('b', null, item.title),
+                  h('p', null, item.why),
+                  h('em', null, item.action),
+                  h('div', { className: 'dsh-dash-acts' },
+                    h('button', { type: 'button', className: 'is-yes', onClick: () => onDecide(item.id, 'approved') }, t('panel.agree')),
+                    h('button', { type: 'button', onClick: () => onDecide(item.id, 'rejected') }, t('panel.reject')))))
+              : h('p', { className: 'dsh-dash-hint' }, t('panel.noSug')))
+        )
+      );
     }
+
+    function Panel({ onClose }) {
+      const [data, setData] = useState(null);
+      const [tab, setTab] = useState(null);
+      const [busy, setBusy] = useState(false);
+      const [note, setNote] = useState('');
+      const [draft, setDraft] = useState('');
+      const panelRef = useRef(null);
+      const locale = useLocale();
+      const t = (key) => TEXT[locale][key] ?? key;
+
+      const load = async () => {
+        try {
+          const reply = await fetch(`${API}/summary`);
+          const body = await reply.json();
+          setData(body);
+        } catch { /* the panel stays on the empty state */ }
+      };
+
+      useEffect(() => { load(); }, []);
+
+      // Clicking anywhere outside the sheet closes it, the same way the other
+      // sidebar panels behave. Capture phase so a stopPropagation inside the
+      // chat composer cannot swallow it.
+      useEffect(() => {
+        const onDown = (event) => {
+          const sheet = panelRef.current;
+          if (sheet && sheet.contains(event.target)) return;
+          if (event.target && event.target.closest && event.target.closest('.dsh-dash-quick')) return;
+          onClose();
+        };
+        const onKey = (event) => { if (event.key === 'Escape') onClose(); };
+        document.addEventListener('pointerdown', onDown, true);
+        document.addEventListener('keydown', onKey);
+        return () => {
+          document.removeEventListener('pointerdown', onDown, true);
+          document.removeEventListener('keydown', onKey);
+        };
+      }, [onClose]);
+
+      const refresh = async () => {
+        setBusy(true);
+        try {
+          const reply = await fetch(`${API}/refresh`, { method: 'POST' });
+          const body = await reply.json();
+          if (body.latest) setData((current) => ({ ...(current || {}), ...body.latest, registry: current?.registry }));
+          else await load();
+        } catch { await load(); }
+        setBusy(false);
+      };
+
+      const decide = async (id, decision) => {
+        setNote(t(decision === 'approved' ? 'panel.agreed' : 'panel.rejected'));
+        await fetch(`${API}/decide`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ id, decision })
+        }).catch(() => {});
+        await load();
+        setTimeout(() => setNote(''), 2400);
+      };
+
+      const watch = async () => {
+        if (!draft.trim()) return;
+        await fetch(`${API}/watch`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ url: draft.trim() })
+        }).catch(() => {});
+        setDraft('');
+        await load();
+      };
+
+      const registry = data?.registry || {};
+      const snapshot = data?.snapshot || {};
+      const plugins = data?.ok === false ? (registry.plugins || []) : (snapshot.plugins || registry.plugins || []);
+      const active = plugins.find((item) => item.id === tab) || plugins[0] || null;
+      const pending = (data?.suggestions || []).filter((item) => item.status === 'pending').length;
+      const x = snapshot.x || registry.x || {};
+
+      return h('div', { className: 'dsh-dash-mask', role: 'dialog', 'aria-modal': 'true' },
+        h('section', { className: 'dsh-dash-panel', ref: panelRef },
+          h('header', { className: 'dsh-dash-head' },
+            h('div', null,
+              h('h3', null, t('panel.title'), pending ? h('i', { className: 'dsh-dash-badge' }, pending) : null),
+              h('p', null, t('panel.sub'))),
+            h('div', { className: 'dsh-dash-head-acts' },
+              h('small', null, data?.snapshot ? `${t('panel.updated')} ${(data.snapshot.at || '').slice(11, 16)}` : ''),
+              h('button', { type: 'button', className: 'is-ghost', onClick: refresh, disabled: busy },
+                busy ? t('panel.refreshing') : t('panel.refresh')),
+              h('button', { type: 'button', className: 'dsh-dash-x', onClick: onClose, 'aria-label': 'close' }, '×'))),
+          plugins.length
+            ? h('nav', { className: 'dsh-dash-tabs' },
+                plugins.map((plugin) => h('button', {
+                  key: plugin.id,
+                  type: 'button',
+                  className: `dsh-dash-tab${active && active.id === plugin.id ? ' is-on' : ''}`,
+                  onClick: () => setTab(plugin.id)
+                },
+                  h(Avatar, { plugin, size: 20 }),
+                  h('span', null, plugin.name?.[locale] || plugin.name?.zh || plugin.id))))
+            : null,
+          h('div', { className: 'dsh-dash-body' },
+            data === null
+              ? h('p', { className: 'dsh-dash-hint' }, t('panel.empty'))
+              : active
+                ? h(Board, { plugin: active, events: data.events || [], suggestions: data.suggestions || [], t, onDecide: decide })
+                : h('p', { className: 'dsh-dash-hint' }, t('panel.empty'))),
+          h('footer', { className: 'dsh-dash-foot' },
+            h('div', { className: 'dsh-dash-x-card' },
+              h('b', null, t('panel.x')),
+              h('span', null, `@${x.handle || 'mixinhub'}`),
+              h('span', null, `${x.followers ?? '—'} ${t('panel.followers')}`),
+              h('span', null, `${(x.posts || []).length} ${t('panel.watch')}`),
+              h('div', { className: 'dsh-dash-watch' },
+                h('input', {
+                  value: draft,
+                  placeholder: t('panel.watchHint'),
+                  onChange: (event) => setDraft(event.target.value),
+                  onKeyDown: (event) => { if (event.key === 'Enter') watch(); }
+                }),
+                h('button', { type: 'button', onClick: watch }, t('panel.watchAdd')))),
+            h('p', { className: 'dsh-dash-gate' }, note || t('panel.gate')))
+        ));
+    }
+
+    function Quick({ open, setOpen, pending }) {
+      const ref = useRef(null);
+      return h('button', {
+        type: 'button',
+        ref,
+        className: `dsh-dash-quick${open ? ' is-open' : ''}`,
+        'aria-label': TEXT.zh['nav.label'],
+        'aria-expanded': open ? 'true' : 'false',
+        onClick: () => setOpen(!open)
+      },
+        h('svg', { viewBox: '0 0 20 20', width: 16, height: 16, 'aria-hidden': 'true' },
+          h('rect', { x: 2.4, y: 3.2, width: 15.2, height: 4.1, rx: 2.05 }),
+          h('rect', { x: 2.4, y: 8.6, width: 9.6, height: 4.1, rx: 2.05 }),
+          h('rect', { x: 2.4, y: 14, width: 6.2, height: 3.4, rx: 1.7 })),
+        h('span', null, TEXT.zh['nav.label']),
+        pending ? h('i', null, pending) : null);
+    }
+
+    function Shell() {
+      const [open, setOpen] = useState(false);
+      const [pending, setPending] = useState(0);
+      useEffect(() => {
+        let alive = true;
+        const tick = async () => {
+          try {
+            const reply = await fetch(`${API}/summary`);
+            const body = await reply.json();
+            if (!alive) return;
+            setPending((body.suggestions || []).filter((item) => item.status === 'pending').length);
+          } catch {}
+        };
+        tick();
+        const timer = setInterval(tick, 120000);
+        return () => { alive = false; clearInterval(timer); };
+      }, [open]);
+      return h(React.Fragment, null,
+        h(Quick, { open, setOpen, pending }),
+        open && createPortal
+          ? createPortal(h(Panel, { onClose: () => setOpen(false) }), document.body)
+          : null);
+    }
+
+    const CSS = `
+      .dsh-dash-quick{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 11px 0 9px;margin:2px 6px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--dsw-alias-label-secondary,#9aa3ad);font:inherit;font-size:12.5px;cursor:pointer;transition:background .16s ease,color .16s ease,border-color .16s ease;}
+      .dsh-dash-quick:hover,.dsh-dash-quick.is-open{background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#2a2b2f) 72%,transparent);border-color:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 26%,transparent);color:var(--dsw-alias-label-primary,#e8ecf1);}
+      .dsh-dash-quick svg{fill:currentColor;opacity:.85}
+      .dsh-dash-quick.is-open svg{opacity:1;fill:var(--dsw-alias-brand-primary,#4d6bfe)}
+      .dsh-dash-quick i{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--dsw-alias-brand-primary,#4d6bfe);color:#fff;font-size:10px;font-style:normal;font-weight:600;}
+      .dsh-dash-mask{position:fixed;inset:0;z-index:5200;display:flex;align-items:center;justify-content:center;padding:40px 24px 84px;background:transparent;}
+      .dsh-dash-panel{width:min(820px,calc(100vw - 48px));max-height:min(72vh,660px);display:flex;flex-direction:column;overflow:hidden;border-radius:18px;padding:2px;
+        background:color-mix(in srgb,var(--dsw-specific-sidebar-fill,#2b2c30) 40%,transparent);
+        -webkit-backdrop-filter:var(--dsw-menu-backdrop-filter,blur(40px) saturate(150%));backdrop-filter:var(--dsw-menu-backdrop-filter,blur(40px) saturate(150%));
+        border:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 9%,transparent);
+        box-shadow:0 24px 60px -24px rgba(0,0,0,.55),inset 0 1px 0 color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 7%,transparent);}
+      @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.dsh-dash-panel{background:var(--dsw-specific-menu,var(--dsw-alias-bg-overlay,#1b1c1f));}}
+      .dsh-dash-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:16px 16px 10px;}
+      .dsh-dash-head h3{margin:0;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:var(--dsw-alias-label-primary,#f2f5f8);}
+      .dsh-dash-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 88%,transparent);color:#fff;font-size:10.5px;font-style:normal;}
+      .dsh-dash-head p{margin:4px 0 0;font-size:11.5px;color:var(--dsw-alias-label-tertiary,#8b949e);}
+      .dsh-dash-head-acts{display:flex;align-items:center;gap:8px;}
+      .dsh-dash-head-acts small{font-size:11px;color:var(--dsw-alias-label-tertiary,#8b949e);}
+      .dsh-dash-head-acts button{height:28px;padding:0 10px;border-radius:8px;border:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 12%,transparent);background:transparent;color:var(--dsw-alias-label-secondary,#c3cad3);font:inherit;font-size:11.5px;cursor:pointer;}
+      .dsh-dash-head-acts button:hover{border-color:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 45%,transparent);color:var(--dsw-alias-label-primary,#fff);}
+      .dsh-dash-x{width:28px;padding:0!important;font-size:16px!important;line-height:1;}
+      .dsh-dash-tabs{display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none;}
+      .dsh-dash-tabs::-webkit-scrollbar{display:none}
+      .dsh-dash-tab{display:inline-flex;align-items:center;gap:7px;flex:none;height:30px;padding:0 10px 0 6px;border-radius:9px;border:1px solid transparent;background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#2a2b2f) 40%,transparent);color:var(--dsw-alias-label-secondary,#aeb6c0);font:inherit;font-size:12px;cursor:pointer;}
+      .dsh-dash-tab:hover{color:var(--dsw-alias-label-primary,#fff);}
+      .dsh-dash-tab.is-on{background:color-mix(in srgb,var(--dsw-alias-bg-layer-1,#232324) 66%,transparent);border-color:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 40%,transparent);color:var(--dsw-alias-label-primary,#fff);}
+      .dsh-dash-av{display:inline-flex;align-items:center;justify-content:center;overflow:hidden;flex:none;background:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 12%,transparent);}
+      .dsh-dash-av img{width:100%;height:100%;object-fit:cover;display:block;}
+      .dsh-dash-av.is-letter b{color:var(--dsw-alias-brand-primary,#8fa6ff);font-weight:600;line-height:1}
+      .dsh-dash-body{padding:4px 16px 12px;overflow-y:auto;}
+      .dsh-dash-caps{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px;}
+      .dsh-dash-cap{display:flex;flex-direction:column;gap:3px;padding:9px 11px;border-radius:11px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#26272b) 46%,transparent);border:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 6%,transparent);}
+      .dsh-dash-cap .k{font-size:10.5px;color:var(--dsw-alias-label-tertiary,#8b949e);}
+      .dsh-dash-cap .v{font-size:16px;font-weight:600;letter-spacing:-.01em;color:var(--dsw-alias-label-primary,#f2f5f8);}
+      .dsh-dash-cap.is-ok .v{color:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 40%,#8ff0c0);font-size:13px;}
+      .dsh-dash-cap.is-wait .v{font-size:13px;color:var(--dsw-alias-label-tertiary,#9aa3ad);}
+      .dsh-dash-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+      @media (max-width:720px){.dsh-dash-cols{grid-template-columns:1fr}}
+      .dsh-dash-sec h4{margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--dsw-alias-label-tertiary,#8b949e);}
+      .dsh-dash-hint{margin:0;font-size:12px;color:var(--dsw-alias-label-tertiary,#8b949e);}
+      .dsh-dash-feed{display:grid;grid-template-columns:auto 1fr;grid-template-areas:'src text' 'src meta';gap:2px 8px;padding:7px 0;border-bottom:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 5%,transparent);}
+      .dsh-dash-feed:last-child{border-bottom:0}
+      .dsh-dash-src{grid-area:src;align-self:start;margin-top:1px;padding:1px 5px;border-radius:5px;font-size:9.5px;letter-spacing:.04em;background:color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 8%,transparent);color:var(--dsw-alias-label-secondary,#c3cad3);}
+      .dsh-dash-feed p{grid-area:text;margin:0;font-size:12px;line-height:1.45;color:var(--dsw-alias-label-primary,#e6eaf0);}
+      .dsh-dash-feed time{grid-area:meta;font-size:10.5px;color:var(--dsw-alias-label-tertiary,#8b949e);}
+      .dsh-dash-sug{padding:10px 11px;border-radius:11px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#26272b) 46%,transparent);border:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 6%,transparent);margin-bottom:8px;}
+      .dsh-dash-sug b{display:block;font-size:12.5px;color:var(--dsw-alias-label-primary,#f2f5f8);}
+      .dsh-dash-sug p{margin:4px 0 2px;font-size:11.5px;line-height:1.45;color:var(--dsw-alias-label-secondary,#aeb6c0);}
+      .dsh-dash-sug em{font-style:normal;font-size:11.5px;color:var(--dsw-alias-label-primary,#dfe5ec);}
+      .dsh-dash-acts{display:flex;gap:6px;margin-top:8px;}
+      .dsh-dash-acts button{height:26px;padding:0 10px;border-radius:7px;border:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 12%,transparent);background:transparent;color:var(--dsw-alias-label-secondary,#c3cad3);font:inherit;font-size:11px;cursor:pointer;}
+      .dsh-dash-acts .is-yes{background:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 88%,transparent);border-color:transparent;color:#fff;}
+      .dsh-dash-foot{padding:10px 16px 14px;border-top:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 6%,transparent);}
+      .dsh-dash-x-card{display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--dsw-alias-label-tertiary,#8b949e);}
+      .dsh-dash-x-card b{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--dsw-alias-label-tertiary,#8b949e);}
+      .dsh-dash-watch{display:flex;gap:6px;flex:1 1 260px;}
+      .dsh-dash-watch input{flex:1;height:26px;border-radius:7px;border:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 10%,transparent);background:color-mix(in srgb,var(--dsw-alias-bg-layer-2,#26272b) 60%,transparent);color:var(--dsw-alias-label-primary,#e6eaf0);font:inherit;font-size:11px;padding:0 8px;outline:none;}
+      .dsh-dash-watch input:focus{border-color:color-mix(in srgb,var(--dsw-alias-brand-primary,#4d6bfe) 55%,transparent);}
+      .dsh-dash-watch button{height:26px;padding:0 10px;border-radius:7px;border:1px solid color-mix(in srgb,var(--dsw-alias-label-primary,#fff) 12%,transparent);background:transparent;color:var(--dsw-alias-label-secondary,#c3cad3);font:inherit;font-size:11px;cursor:pointer;}
+      .dsh-dash-gate{margin:8px 0 0;font-size:11px;color:var(--dsw-alias-label-tertiary,#8b949e);}
+      @media (prefers-reduced-motion:reduce){.dsh-dash-quick,.dsh-dash-tab{transition:none}}
+    `;
 
     return {
       inject: ['slots', 'locale'],
       apply(ctx) {
-        const lang = localeOf(ctx);
-        const t = (key) => TEXT[lang][key] ?? key;
-        const openState = { current: false };
-        const listeners = new Set();
-        const setOpen = (next) => {
-          openState.current = next;
-          for (const listener of listeners) listener(next);
-        };
-        const useOpen = () => {
-          const [, force] = useState(0);
-          useEffect(() => {
-            const listener = () => force((value) => value + 1);
-            listeners.add(listener);
-            return () => listeners.delete(listener);
-          }, []);
-          return openState.current;
-        };
-
-        function QuickAction() {
-          const open = useOpen();
-          const [badge, setBadge] = useState(0);
-          useEffect(() => {
-            let alive = true;
-            const load = () => {
-              fetch(`${API}/summary`, { headers: { accept: 'application/json' } })
-                .then((response) => response.json())
-                .then((data) => {
-                  if (!alive || !data?.ok) return;
-                  const events = (data.events ?? []).filter((event) => Date.now() - new Date(event.at).getTime() < 86400000);
-                  setBadge(events.length);
-                })
-                .catch(() => {});
-            };
-            load();
-            const timer = setInterval(load, 120000);
-            return () => { alive = false; clearInterval(timer); };
-          }, []);
-          return h('button', {
-            className: 'dsh-dash-pill',
-            title: t('panel.title'),
-            onClick: () => setOpen(!open)
-          },
-            h(IconBoard, { size: 16 }),
-            h('span', { className: 'dsh-dash-label' }, t('nav.label')),
-            badge > 0 ? h('span', { className: 'dsh-dash-dot' }, badge > 99 ? '99+' : String(badge)) : null);
-        }
-
-        function Panel() {
-          const open = useOpen();
-          const [data, setData] = useState(null);
-          const [busy, setBusy] = useState(false);
-          const [note, setNote] = useState('');
-          const [postUrl, setPostUrl] = useState('');
-
-          const load = () => fetch(`${API}/summary`, { headers: { accept: 'application/json' } })
-            .then((response) => response.json())
-            .then((payload) => setData(payload))
-            .catch(() => setData({ ok: false }));
-
-          useEffect(() => {
-            if (!open) return undefined;
-            load();
-            const timer = setInterval(load, 60000);
-            return () => clearInterval(timer);
-          }, [open]);
-
-          if (!open) return null;
-
-          const refresh = () => {
-            setBusy(true);
-            fetch(`${API}/refresh`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })
-              .then((response) => response.json())
-              .then(() => load())
-              .catch(() => {})
-              .finally(() => setBusy(false));
-          };
-
-          const watch = () => {
-            const url = postUrl.trim();
-            if (!url) return;
-            setBusy(true);
-            fetch(`${API}/watch`, {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({ url })
-            })
-              .then((response) => response.json())
-              .then(() => { setPostUrl(''); load(); })
-              .catch(() => {})
-              .finally(() => setBusy(false));
-          };
-
-          const decide = (id, status) => {
-            setNote(status === 'approved' ? t('panel.agreed') : t('panel.rejected'));
-            fetch(`${API}/decide`, {
-              method: 'POST',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({ id, status })
-            }).then(() => load()).catch(() => {});
-          };
-
-          const snapshot = data?.snapshot ?? null;
-          const plugins = snapshot?.plugins ?? [];
-          const events = (data?.events ?? []).slice(0, 6);
-          const suggestions = (data?.suggestions ?? []).filter((item) => item.status === 'pending');
-
-          const child = h('div', { className: 'dsh-dash-panel', role: 'dialog', 'aria-label': t('panel.title') },
-            h('style', null, CSS),
-            h('div', { className: 'dsh-dash-head' },
-              h('span', { className: 'dsh-dash-title' }, t('panel.title')),
-              h('span', { className: 'dsh-dash-sub' }, `${t('panel.sub')} · ${t('panel.updated')} ${ago(snapshot?.at)}`),
-              h('button', { className: 'dsh-dash-close', onClick: () => setOpen(false), 'aria-label': 'close' }, '×')),
-            h('div', { className: 'dsh-dash-body' },
-              !data || data.ok === false
-                ? h('div', { className: 'dsh-dash-empty' }, t('panel.empty'))
-                : null,
-
-              plugins.length
-                ? h('div', { className: 'dsh-dash-section' },
-                    h('div', { className: 'dsh-dash-h' }, t('panel.metrics')),
-                    plugins.map((plugin) => h('div', { key: plugin.id, className: 'dsh-dash-row' },
-                      h('span', { className: 'dsh-dash-name' }, (plugin.name && (plugin.name[lang] || plugin.name.en)) || plugin.id),
-                      h(Capsule, { label: t('panel.week'), value: plugin.npm?.week, up: (plugin.delta?.week ?? 0) > 0 }),
-                      h(Capsule, { label: t('panel.month'), value: plugin.npm?.month }),
-                      h(Capsule, { label: t('panel.stars'), value: plugin.github?.stars, up: (plugin.delta?.stars ?? 0) > 0 }),
-                      h(Capsule, { label: t('panel.release'), value: plugin.github?.releaseDownloads }),
-                      h(Capsule, { label: t('panel.market'), value: plugin.market ? (plugin.market.npmLinked ? t('panel.linked') : t('panel.unlinked')) : '—' }),
-                      h(Capsule, { label: 'v', value: plugin.npm?.version ?? '—' }))))
-                : null,
-
-              snapshot?.x
-                ? h('div', { className: 'dsh-dash-section' },
-                    h('div', { className: 'dsh-dash-h' }, t('panel.x')),
-                    h('div', { className: 'dsh-dash-row' },
-                      h('span', { className: 'dsh-dash-name' }, `@${snapshot.x.handle}`),
-                      h(Capsule, { label: t('panel.followers'), value: snapshot.x.followers }),
-                      h(Capsule, { label: t('panel.watch'), value: (snapshot.x.posts ?? []).length }),
-                      (snapshot.x.posts ?? []).slice(0, 3).map((post) => h(Capsule, { key: post.id, label: t('panel.newFeedback'), value: post.replies }))),
-                    h('div', { className: 'dsh-dash-row' },
-                      h('input', {
-                        className: 'dsh-dash-btn',
-                        style: { flex: '1 1 260px', minWidth: 0, cursor: 'text', padding: '6px 12px' },
-                        placeholder: t('panel.watchHint'),
-                        value: postUrl,
-                        onChange: (event) => setPostUrl(event.target.value),
-                        onKeyDown: (event) => { if (event.key === 'Enter') watch(); }
-                      }),
-                      h('button', { className: 'dsh-dash-btn primary', disabled: busy || !postUrl.trim(), onClick: watch }, t('panel.watchAdd'))))
-                : null,
-
-              suggestions.length
-                ? h('div', { className: 'dsh-dash-section' },
-                    h('div', { className: 'dsh-dash-h' }, t('panel.suggestions')),
-                    suggestions.map((item) => h('div', { key: item.id, className: 'dsh-dash-item' },
-                      h('p', null, item.title),
-                      h('div', { className: 'dsh-dash-why' }, `${item.why} — ${item.action}`),
-                      (item.samples ?? []).length
-                        ? h('ul', { className: 'dsh-dash-samples' }, item.samples.map((sample, index) => h('li', { key: index }, sample.text)))
-                        : null,
-                      h('div', { className: 'dsh-dash-actions' },
-                        h('button', { className: 'dsh-dash-btn primary', onClick: () => decide(item.id, 'approved') }, t('panel.agree')),
-                        h('button', { className: 'dsh-dash-btn', onClick: () => decide(item.id, 'rejected') }, t('panel.reject'))))))
-                : null,
-
-              events.length
-                ? h('div', { className: 'dsh-dash-section' },
-                    h('div', { className: 'dsh-dash-h' }, t('panel.feedback')),
-                    events.map((event, index) => h('div', { key: index, className: 'dsh-dash-item dsh-dash-feed' },
-                      h('p', null, event.url ? h('a', { href: event.url, target: '_blank', rel: 'noreferrer' }, event.text) : event.text),
-                      h('div', { className: 'dsh-dash-why' }, `${event.source} · ${ago(event.at)}`))))
-                : null),
-
-            h('div', { className: 'dsh-dash-foot' },
-              h('span', { className: 'dsh-dash-gate' }, note || t('panel.gate')),
-              h('button', { className: 'dsh-dash-btn primary', disabled: busy, onClick: refresh }, busy ? t('panel.refreshing') : t('panel.refresh'))));
-
-          return createPortal ? createPortal(child, document.body) : child;
-        }
+        const style = document.createElement('style');
+        style.setAttribute('data-dsh-plugin-dashboard', '');
+        style.textContent = CSS;
+        document.head.appendChild(style);
 
         ctx.slots.inject('sidebar.footer.action', () => ctx.slots.register({
           name: 'sidebar.footer.action',
           id: 'plugin-dashboard-quick',
-          order: 7,
-          label: () => t('nav.label')
-        }, QuickAction));
+          order: 7
+        }, Shell));
 
         ctx.slots.inject('shell.overlay', () => ctx.slots.register({
           name: 'shell.overlay',
           id: 'plugin-dashboard-panel',
           order: 61
-        }, Panel));
+        }, () => null));
       }
     };
   }

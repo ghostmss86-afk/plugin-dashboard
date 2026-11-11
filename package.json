@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-dashboard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Plugin dashboard: npm downloads, GitHub stats, market placement and X feedback for the plugins you publish, as a glass capsule panel inside DeepSeek Harness.",
   "type": "module",
   "license": "MIT",
