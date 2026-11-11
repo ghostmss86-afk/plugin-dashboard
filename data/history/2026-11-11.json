@@ -1,6 +1,6 @@
 {
   "snapshot": {
-    "at": "2026-11-11T18:45:12.008Z",
+    "at": "2026-11-11T18:51:46.961Z",
     "x": {
       "handle": "mixinhub",
       "followers": 84,
@@ -82,8 +82,8 @@
           "package": "dsh-featured-market",
           "week": 2819,
           "month": 2819,
-          "version": "1.7.0",
-          "published": "2026-11-11T18:36:05.577Z"
+          "version": "1.7.1",
+          "published": "2026-11-11T18:45:26.982Z"
         },
         "github": {
           "repo": "ghostmss86-afk/dsh-featured-market",
@@ -91,7 +91,7 @@
           "forks": 0,
           "watchers": 0,
           "openIssues": 0,
-          "pushedAt": "2026-11-11T18:44:54Z",
+          "pushedAt": "2026-11-11T18:51:18Z",
           "releases": [
             {
               "at": "2026-11-11T18:41:13Z",
@@ -141,7 +141,7 @@
           "week": 0,
           "month": 0,
           "stars": 0,
-          "releaseDownloads": 1
+          "releaseDownloads": 0
         }
       }
     ]
