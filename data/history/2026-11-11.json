@@ -1,0 +1,72 @@
+{
+  "snapshot": {
+    "at": "2026-11-11T18:05:29.267Z",
+    "x": {
+      "handle": "mixinhub",
+      "followers": 84,
+      "tweets": 347,
+      "posts": []
+    },
+    "plugins": [
+      {
+        "id": "dsh-skin-studio",
+        "name": {
+          "en": "Skin Studio",
+          "zh": "皮肤与壁纸"
+        },
+        "npm": {
+          "package": "dsh-plugin-skin-studio",
+          "week": 333,
+          "month": 333,
+          "version": "1.0.35",
+          "published": "2026-11-11T14:20:23.044Z"
+        },
+        "github": {
+          "repo": "ghostmss86-afk/dsh-skin-studio",
+          "stars": 1,
+          "forks": 0,
+          "watchers": 0,
+          "openIssues": 0,
+          "pushedAt": "2026-11-11T14:16:59Z",
+          "releases": [
+            {
+              "at": "2026-11-11T14:17:32Z",
+              "dl": 0,
+              "tag": "v1.0.35"
+            },
+            {
+              "at": "2026-11-11T12:17:43Z",
+              "dl": 0,
+              "tag": "v1.0.34"
+            },
+            {
+              "at": "2026-11-09T21:50:45Z",
+              "dl": 0,
+              "tag": "v1.0.30"
+            },
+            {
+              "at": "2026-11-09T08:03:38Z",
+              "dl": 0,
+              "tag": "v1.0.1"
+            }
+          ],
+          "releaseDownloads": 0
+        },
+        "market": {
+          "dl": null,
+          "stars": null,
+          "npmLinked": false,
+          "added": "2026-11-10",
+          "url": "https://awesome-dsh-plugin.com/p/ghostmss86-afk/dsh-skin-studio/"
+        },
+        "delta": {
+          "week": 0,
+          "month": 0,
+          "stars": 0,
+          "releaseDownloads": 0
+        }
+      }
+    ]
+  },
+  "events": []
+}

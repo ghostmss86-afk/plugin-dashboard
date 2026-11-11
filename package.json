@@ -1,0 +1,55 @@
+{
+  "name": "dsh-plugin-dashboard",
+  "version": "0.1.0",
+  "description": "Plugin dashboard: npm downloads, GitHub stats, market placement and X feedback for the plugins you publish, as a glass capsule panel inside DeepSeek Harness.",
+  "type": "module",
+  "license": "MIT",
+  "author": "ghostmss86-afk",
+  "homepage": "https://github.com/ghostmss86-afk/plugin-dashboard",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ghostmss86-afk/plugin-dashboard.git"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh-plugin",
+    "dashboard",
+    "metrics",
+    "feedback",
+    "analytics"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "data/registry.json",
+    "scripts/*.mjs",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-layout"
+      ]
+    }
+  },
+  "scripts": {
+    "collect": "node scripts/collect.mjs",
+    "check": "node --check index.js && node --check client.js && node --check scripts/collect.mjs"
+  }
+}

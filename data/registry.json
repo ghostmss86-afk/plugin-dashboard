@@ -1,0 +1,13 @@
+{
+  "x": { "handle": "mixinhub", "posts": [] },
+  "plugins": [
+    {
+      "id": "dsh-skin-studio",
+      "name": { "en": "Skin Studio", "zh": "皮肤与壁纸" },
+      "npm": "dsh-plugin-skin-studio",
+      "repo": "ghostmss86-afk/dsh-skin-studio",
+      "market": "ghostmss86-afk/dsh-skin-studio",
+      "xPosts": []
+    }
+  ]
+}

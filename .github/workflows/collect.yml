@@ -1,0 +1,32 @@
+name: collect
+
+# One observation pass a day, committed back to the repo so the board has a
+# history even when nobody opens the app. This job only writes data/*.json and
+# reports/*.md — it never touches a plugin's source or publishes anything.
+on:
+  schedule:
+    - cron: '17 1 * * *'   # 01:17 UTC = 09:17 Asia/Shanghai, before the market rebuild at 10:23
+  workflow_dispatch:
+  push:
+    paths-ignore: ['data/**', 'reports/**']
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/collect.mjs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          git config user.name 'dashboard-bot'
+          git config user.email 'dashboard-bot@users.noreply.github.com'
+          git add data reports
+          git diff --cached --quiet || git commit -m "chore(collect): $(date -u +%Y-%m-%d) snapshot"
+          git push
