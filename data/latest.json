@@ -1,10 +1,10 @@
 {
   "snapshot": {
-    "at": "2026-11-11T18:51:46.961Z",
+    "at": "2026-11-12T08:23:35.243Z",
     "x": {
       "handle": "mixinhub",
-      "followers": 84,
-      "tweets": 347,
+      "followers": null,
+      "tweets": null,
       "posts": []
     },
     "plugins": [
@@ -21,8 +21,8 @@
           "package": "dsh-plugin-skin-studio",
           "week": 333,
           "month": 333,
-          "version": "1.0.35",
-          "published": "2026-11-11T14:20:23.044Z"
+          "version": "1.0.36",
+          "published": "2026-11-11T20:51:49.548Z"
         },
         "github": {
           "repo": "ghostmss86-afk/dsh-skin-studio",
@@ -30,8 +30,18 @@
           "forks": 0,
           "watchers": 0,
           "openIssues": 0,
-          "pushedAt": "2026-11-11T14:16:59Z",
+          "pushedAt": "2026-11-11T21:43:42Z",
           "releases": [
+            {
+              "at": "2026-11-12T02:04:49Z",
+              "dl": 0,
+              "tag": "v1.0.38"
+            },
+            {
+              "at": "2026-11-11T20:40:15Z",
+              "dl": 0,
+              "tag": "v1.0.36"
+            },
             {
               "at": "2026-11-11T14:17:32Z",
               "dl": 0,
@@ -57,7 +67,7 @@
         },
         "market": {
           "dl": null,
-          "stars": null,
+          "stars": 1,
           "npmLinked": false,
           "added": "2026-11-10",
           "url": "https://awesome-dsh-plugin.com/p/ghostmss86-afk/dsh-skin-studio/"
@@ -82,8 +92,8 @@
           "package": "dsh-featured-market",
           "week": 2819,
           "month": 2819,
-          "version": "1.7.1",
-          "published": "2026-11-11T18:45:26.982Z"
+          "version": "1.7.3",
+          "published": "2026-11-11T20:02:36.864Z"
         },
         "github": {
           "repo": "ghostmss86-afk/dsh-featured-market",
@@ -91,57 +101,16 @@
           "forks": 0,
           "watchers": 0,
           "openIssues": 0,
-          "pushedAt": "2026-11-11T18:51:18Z",
-          "releases": [
-            {
-              "at": "2026-11-11T18:41:13Z",
-              "dl": 0,
-              "tag": "v1.7.1"
-            },
-            {
-              "at": "2026-11-11T18:33:54Z",
-              "dl": 1,
-              "tag": "v1.7.0"
-            },
-            {
-              "at": "2026-11-11T17:17:56Z",
-              "dl": 7,
-              "tag": "v1.6.8"
-            },
-            {
-              "at": "2026-11-09T21:17:37Z",
-              "dl": 62,
-              "tag": "v1.6.7"
-            },
-            {
-              "at": "2026-11-08T18:54:59Z",
-              "dl": 1,
-              "tag": "v1.6.6"
-            },
-            {
-              "at": "2026-11-08T18:26:11Z",
-              "dl": 1,
-              "tag": "v1.6.5"
-            },
-            {
-              "at": "2026-11-08T18:00:10Z",
-              "dl": 1,
-              "tag": "v1.6.4"
-            },
-            {
-              "at": "2026-11-08T17:18:13Z",
-              "dl": 1,
-              "tag": "v1.6.3"
-            }
-          ],
-          "releaseDownloads": 94
+          "pushedAt": "2026-11-12T02:05:15Z",
+          "releases": [],
+          "releaseDownloads": 0
         },
         "market": null,
         "delta": {
           "week": 0,
           "month": 0,
           "stars": 0,
-          "releaseDownloads": 0
+          "releaseDownloads": -94
         }
       }
     ]
@@ -156,7 +125,7 @@
       "action": "可以按自己的节奏做功能，不必赶修",
       "samples": [],
       "status": "pending",
-      "at": "2026-11-11T18:51:46.962Z"
+      "at": "2026-11-12T08:23:35.244Z"
     },
     {
       "id": "sig-dsh-featured-market-quiet",
@@ -166,7 +135,7 @@
       "action": "可以按自己的节奏做功能，不必赶修",
       "samples": [],
       "status": "pending",
-      "at": "2026-11-11T18:51:46.962Z"
+      "at": "2026-11-12T08:23:35.244Z"
     }
   ]
 }
