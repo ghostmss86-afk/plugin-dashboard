@@ -1,0 +1,119 @@
+{
+  "snapshot": {
+    "at": "2026-11-13T08:03:40.035Z",
+    "x": {
+      "handle": "mixinhub",
+      "followers": null,
+      "tweets": null,
+      "posts": []
+    },
+    "plugins": [
+      {
+        "id": "dsh-plugin-skin-studio",
+        "name": {
+          "en": "Skin Studio",
+          "zh": "皮肤与壁纸"
+        },
+        "category": "theme",
+        "icon": null,
+        "source": "manual",
+        "npm": {
+          "package": "dsh-plugin-skin-studio",
+          "week": 860,
+          "month": 860,
+          "version": "1.0.36",
+          "published": "2026-11-11T20:51:49.548Z"
+        },
+        "github": {
+          "repo": "ghostmss86-afk/dsh-skin-studio",
+          "stars": 1,
+          "forks": 0,
+          "watchers": 0,
+          "openIssues": 0,
+          "pushedAt": "2026-11-11T21:43:42Z",
+          "releases": [
+            {
+              "at": "2026-11-12T02:04:49Z",
+              "dl": 0,
+              "tag": "v1.0.38"
+            },
+            {
+              "at": "2026-11-11T20:40:15Z",
+              "dl": 0,
+              "tag": "v1.0.36"
+            },
+            {
+              "at": "2026-11-11T14:17:32Z",
+              "dl": 0,
+              "tag": "v1.0.35"
+            },
+            {
+              "at": "2026-11-11T12:17:43Z",
+              "dl": 0,
+              "tag": "v1.0.34"
+            },
+            {
+              "at": "2026-11-09T21:50:45Z",
+              "dl": 0,
+              "tag": "v1.0.30"
+            },
+            {
+              "at": "2026-11-09T08:03:38Z",
+              "dl": 0,
+              "tag": "v1.0.1"
+            }
+          ],
+          "releaseDownloads": 0
+        },
+        "market": {
+          "dl": null,
+          "stars": 1,
+          "npmLinked": false,
+          "added": "2026-11-10",
+          "url": "https://awesome-dsh-plugin.com/p/ghostmss86-afk/dsh-skin-studio/"
+        },
+        "delta": {
+          "week": 527,
+          "month": 527,
+          "stars": 0,
+          "releaseDownloads": 0
+        }
+      },
+      {
+        "id": "dsh-featured-market",
+        "name": {
+          "en": "Curated market",
+          "zh": "精选插件市场"
+        },
+        "category": "market",
+        "icon": null,
+        "source": "manual",
+        "npm": {
+          "package": "dsh-featured-market",
+          "week": 3628,
+          "month": 3628,
+          "version": "1.7.3",
+          "published": "2026-11-11T20:02:36.864Z"
+        },
+        "github": {
+          "repo": "ghostmss86-afk/dsh-featured-market",
+          "stars": 0,
+          "forks": 0,
+          "watchers": 0,
+          "openIssues": 0,
+          "pushedAt": "2026-11-12T02:05:15Z",
+          "releases": [],
+          "releaseDownloads": 0
+        },
+        "market": null,
+        "delta": {
+          "week": 809,
+          "month": 809,
+          "stars": 0,
+          "releaseDownloads": 0
+        }
+      }
+    ]
+  },
+  "events": []
+}
